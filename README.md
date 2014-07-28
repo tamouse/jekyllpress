@@ -8,6 +8,18 @@ A [Thor](http://whatisthor.com) script that provides several actions to help sup
 
 ## Usage
 
+### Setting Up Templates
+
+If you don't have templates specified in your `_config.yml` file or in your `source` folder, you can create them with the `setup` action:
+
+    $ jekyllpress setup
+    Configuration file: /Volumes/muis1t/Projects/rubystuff/jekyll/test_jekyll_2.1/_config.yml
+          create  _templates
+          create  _templates/new_post.markdown
+          create  _templates/new_page.markdown
+
+You can edit the markdown templates to your heart's delight. :)
+
 ### New Post
 
 Creating a new post is done with:
@@ -93,17 +105,7 @@ Create a new page with title TITLE
 * the `location` option lets you specify a path down to where the page will live.
 * the location *must* be relative, and will placed starting from the source folder.
 
-### Setting Up Templates
 
-If you don't have templates specified in your `_config.yml` file or in your `source` folder, you can create them with the `setup` action:
-
-    $ jekyllpress setup
-    Configuration file: /Volumes/muis1t/Projects/rubystuff/jekyll/test_jekyll_2.1/_config.yml
-          create  _templates
-          create  _templates/new_post.markdown
-          create  _templates/new_page.markdown
-
-You can edit the markdown templates to your heart's delight. :)
 
 ## Contributing
 
