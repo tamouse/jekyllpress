@@ -70,6 +70,7 @@ module Jekyllpress
       @title = ask("Page title: ") if @title.empty?
 
       location = options.fetch("location", nil)
+      raise "location can not be an absolute path: #{location}" if location[0] == ?/
 
       with_config do |config|
         filename = destination(source, location, page_dirname(title), index_name)

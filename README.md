@@ -58,6 +58,41 @@ Actions and options can be seen by running `jekyllpress` with no paramters, or w
       jekyllpress setup           # Set up templates
       jekyllpress version         # Display Jekyllpress::App version string
 
+To see the options for `new_post`, enter:
+
+    $ jekyllpress help new_post
+
+```
+Usage:
+  jekyllpress new_post TITLE
+
+Options:
+  -c, [--categories=one two three]  # list of categories to assign this post
+  -t, [--tags=one two three]        # list of tags to assign this post
+
+Create a new post with title TITLE
+```
+
+* `categories` and `tags` are arrays. Give each category or tag item after the parameter.
+* The equals sign after the option name is ... *optional*.
+
+To see the options for `new_page`, enter:
+
+    $ jekyllpress help new_page
+
+```
+Usage:
+  jekyllpress new_page TITLE
+
+Options:
+  -l, --loc, [--location=LOCATION]  # Location for page to appear in directory
+
+Create a new page with title TITLE
+```
+
+* the `location` option lets you specify a path down to where the page will live.
+* the location *must* be relative, and will placed starting from the source folder.
+
 ### Setting Up Templates
 
 If you don't have templates specified in your `_config.yml` file or in your `source` folder, you can create them with the `setup` action:
