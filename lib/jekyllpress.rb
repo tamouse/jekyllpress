@@ -11,10 +11,6 @@ module Jekyllpress
     package_name 'Jekyllpress::App'
     map ["-V","--version"] => :version
 
-    class_option :config, :aliases => "-C", :default => "./_config.yml"
-
-    source_root(Dir.pwd)
-
     desc "version", "Display Jekyllpress::App version string"
     def version
       say "Jekyllpress Version: #{Jekyllpress::VERSION}"
@@ -88,6 +84,7 @@ module Jekyllpress
 
     def with_config
       raise "no block given at #{caller[1]}" unless block_given?
+      self.class.source_root(jekyll_config["source"])
       yield jekyll_config
     end
 
