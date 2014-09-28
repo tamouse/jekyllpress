@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "pry", "~> 0.9"
-  spec.add_development_dependency "pry-debugger"
+  spec.add_development_dependency "pry-byebug"
   spec.add_development_dependency "awesome_print"
   spec.add_development_dependency "guard"
   spec.add_development_dependency "guard-rspec"

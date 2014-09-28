@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'jekyllpress'
 
 describe Jekyllpress do
   it 'has a version number' do

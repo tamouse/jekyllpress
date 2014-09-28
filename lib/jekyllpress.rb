@@ -81,12 +81,44 @@ module Jekyllpress
       end
     end
 
+    desc "redirect OLD_DIR", "Add a jekyll-redirect-from entry in every post based on OLD_DIR"
+    def redirect(old_dir="")
+      @old_dir = old_dir.to_s
+      @old_dir = ask("Old directory to use in redirect: ") if @old_dir.empty?
+      processed_posts = []
+      with_posts do |post|
+        if post.data.has_key?("redirect_from")
+          say "skipping #{post.name} - redirect_from detected"
+          next 
+        end
+        say "processing #{post.name}"
+        post.data.merge!({
+          "redirect_from" => Array(File.join('', old_dir, post.url))
+          })
+        rewrite_post(post)
+        say "wrote #{post.name}"
+        processed_posts << {name: post.name, file: post_file_name(post)}
+      end
+      [__method__, @old_dir, processed_posts]
+    end
+
     private
 
     def with_config
       raise "no block given at #{caller[1]}" unless block_given?
       self.class.source_root(jekyll_config["source"])
       yield jekyll_config
+    end
+
+    def with_posts
+      with_config do |config|
+        site = Jekyll::Site.new(config)
+        site.reset
+        site.read
+        site.posts.each do |post|
+          yield post
+        end
+      end
     end
 
     def check_templates
@@ -152,6 +184,21 @@ module Jekyllpress
 
     def new_page_template
       jekyll_config["templates"]["new_page_template"]
+    end
+
+    def post_file_name(post)
+      File.join(post.site.source, post.path)
+    end
+
+    def rewrite_post(post)
+      file = post_file_name(post)
+      # backup current file
+      FileUtils.copy_file(file, "#{file}.bak")
+      File.open(file, 'w') do |f|
+        f.puts post.data.to_yaml
+        f.puts "---"
+        f.write post.content
+      end
     end
   end
 

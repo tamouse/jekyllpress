@@ -118,5 +118,27 @@ Dir.chdir(Pathname.new('spec/test_site')) do |test_dir|
 
     end
 
+    describe ":redirect" do
+      before(:all) do
+        @action, @old_dir, @posts = Jekyllpress::App.start(%w[redirect BLOG])
+      end
+
+      it "each post has a redirect_from: in frontmatter" do
+        @posts.each do |post|
+          post_content = File.read post[:file]
+          expect(post_content).to match(%r{^redirect_from:$}) 
+        end
+      end
+
+      after(:all) do
+        # restore backups to normal
+        @posts.each do |post|
+          FileUtils.mv("#{post[:file]}.bak", post[:file], force: true)
+        end
+      end
+
+
+    end
+
   end
 end
