@@ -1,0 +1,9 @@
+78c8b1c (HEAD, master) new: Add :redirect command to insert a 'redirect_from:' array in the front matter of each post in the _posts directory, to allow for blog restructuring, in service of using the jekyll-redirect-from gem.
+4957944 (tag: v0.0.3, origin/master) Forgot to add thor as a dependency! Doh!
+a905e0e Move setup action to beginning of Usage section in README
+2ba98e4 (tag: v0.0.2) version bump
+2fee61c clean up tests, all running under one test_site
+df41340 add usage examples to README
+9ce0103 (tag: v0.0.1) Move source_path into with_config
+944f3cd setup, new_post, new_page actions
+eed0fcd Initial Commit
