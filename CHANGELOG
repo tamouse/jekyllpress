@@ -1,5 +1,8 @@
-78c8b1c (HEAD, master) new: Add :redirect command to insert a 'redirect_from:' array in the front matter of each post in the _posts directory, to allow for blog restructuring, in service of using the jekyll-redirect-from gem.
-4957944 (tag: v0.0.3, origin/master) Forgot to add thor as a dependency! Doh!
+263acca (HEAD, origin/master, master) fix: use thor actions to inject redirect_from into post.
+61a16b8 new: Add options to redirect to specify the permalink template and force overwriting.
+dbb8b67 (tag: v0.1.0) new: Add CHANGELOG.
+78c8b1c new: Add :redirect command to insert a 'redirect_from:' array in the front matter of each post in the _posts directory, to allow for blog restructuring, in service of using the jekyll-redirect-from gem.
+4957944 (tag: v0.0.3) Forgot to add thor as a dependency! Doh!
 a905e0e Move setup action to beginning of Usage section in README
 2ba98e4 (tag: v0.0.2) version bump
 2fee61c clean up tests, all running under one test_site
