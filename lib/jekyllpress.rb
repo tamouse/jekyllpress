@@ -94,7 +94,6 @@ module Jekyllpress
       force_redirect = options.fetch("force") { false }
       processed_posts = []
       with_posts({"permalink" => permalink_template}) do |post|
-        # binding.pry
         if post.data.has_key?("redirect_from") && !force_redirect
           say "skipping #{post.name} - redirect_from detected"
           next 
@@ -111,7 +110,6 @@ redirect_from:
         processed_posts << {name: post.name, file: post_file_name(post)}
       end
 
-      binding.pry
       [__method__, @old_dir, processed_posts]
     end
 
