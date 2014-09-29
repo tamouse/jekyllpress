@@ -115,7 +115,7 @@ describe "my Jekyllpress Thor script" do
     end
 
     it "should abort when no templates are found" do
-      expect{Jekyllpress::App.start(%w[new_page blah])}.to raise_error(::Errno::ENOENT)
+      expect{Jekyllpress::App.start(%w[new_page blah])}.to raise_error(Jekyllpress::SetupError)
     end
 
     context ":setup" do
@@ -152,7 +152,7 @@ describe "my Jekyllpress Thor script" do
   end
 
   describe ":redirect" do
-    before(:all) do
+    before do
       kill_jekyll
       Dir.chdir("spec") do |spec_dir|
         FileUtils.rm_rf TEST_SITE
@@ -162,7 +162,7 @@ describe "my Jekyllpress Thor script" do
           File.open(File.join("_posts","2013-12-31-an-old-post.markdown"), 'w') do |post|
             frontmatter = {
               "title" => "An old post", 
-              "date" => DateTime.new(2013,12,31,12,31), 
+              "date" => "2013-12-31 12:31",
               "layout" => "post", 
               "redirect_from" => Array("/oldsite/2013/12/31/an-old-post/")
             }
@@ -176,17 +176,17 @@ describe "my Jekyllpress Thor script" do
       end
     end
 
-    after(:all) do
+    after do
       Dir.chdir("spec") do |spec_dir|
         FileUtils.rm_rf TEST_SITE
       end
     end
 
-    after(:each) do # restore backups to normal
-      @posts.each do |post|
-        FileUtils.mv("#{post[:file]}.bak", post[:file], force: true, verbose: true)
-      end
-    end
+    # after(:each) do # restore backups to normal
+    #   @posts.each do |post|
+    #     FileUtils.mv("#{post[:file]}.bak", post[:file], force: true, verbose: true)
+    #   end
+    # end
 
     it "only one post has a redirect_from: in frontmatter" do
       Dir.chdir(File.join("spec", TEST_SITE)) do |test_site|
@@ -195,7 +195,7 @@ describe "my Jekyllpress Thor script" do
         @posts.each do |post|
           post_content = File.read post[:file]
           expect(post_content).to match(%r{^redirect_from:$}) 
-          expect(post_content).to  match(%r{^- "/BLOG/})
+          expect(post_content).to  match(%r{^  - /BLOG/})
         end
       end
     end
@@ -206,7 +206,7 @@ describe "my Jekyllpress Thor script" do
       @posts.each do |post|
         post_content = File.read post[:file]
         expect(post_content).to match(%r{^redirect_from:$})
-        expect(post_content).to  match(%r{^- "/BLOG/})
+        expect(post_content).to  match(%r{^  - /BLOG/})
       end
     end
 

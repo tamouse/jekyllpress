@@ -6,6 +6,9 @@ require "jekyllpress/version"
 
 module Jekyllpress
 
+  SETUPERROR_MESSAGE = "It appears you have not set up a template directory yet.\nRun `#{$0} setup` to set up the templates properly."
+  class SetupError < RuntimeError; end
+
   class App < Thor
     include Thor::Actions
     package_name 'Jekyllpress::App'
@@ -96,14 +99,19 @@ module Jekyllpress
           say "skipping #{post.name} - redirect_from detected"
           next 
         end
-        say "processing #{post.name}"
-        post.data.merge!({
-          "redirect_from" => Array(File.join('', old_dir, post.url))
-          })
-        rewrite_post(post)
-        say "wrote #{post.name}"
+
+        time_now = Time.now
+        insert_text = %Q{# BEGIN: redirect added by jekyllpress on #{time_now}
+redirect_from:
+  - #{File.join('', old_dir, post.url)}
+# END:   redirect added by jekyllpress on #{time_now}
+}
+        insert_into_file(post_file_name(post), insert_text, :after => %r{\A---\n})
+
         processed_posts << {name: post.name, file: post_file_name(post)}
       end
+
+      binding.pry
       [__method__, @old_dir, processed_posts]
     end
 
@@ -128,13 +136,12 @@ module Jekyllpress
     end
 
     def check_templates
+      raise SetupError.new SETUPERROR_MESSAGE unless jekyll_config.has_key?("templates")
       File.stat(File.join(source, template_dir))
       File.stat(File.join(source, template_dir, new_page_template))
       File.stat(File.join(source, template_dir, new_post_template))
     rescue ::Errno::ENOENT => error
-      warn "It appears you have not set up a template directory yet.",
-        "Run `#{$0} setup` to set up the templates directory"
-      raise error
+      raise SetupError.new SETUPERROR_MESSAGE
     end
 
     def jekyll_config(options={})
@@ -150,8 +157,9 @@ module Jekyllpress
             })
         end
       end
-
+      # @jekyll_config ||= Jekyll.configuration(options)
     end
+
     def new_ext
       jekyll_config["markdown_ext"].split(',').first
     end
@@ -196,16 +204,6 @@ module Jekyllpress
       File.join(post.site.source, post.path)
     end
 
-    def rewrite_post(post)
-      file = post_file_name(post)
-      # backup current file
-      FileUtils.copy_file(file, "#{file}.bak")
-      File.open(file, 'w') do |f|
-        f.puts post.data.to_yaml
-        f.puts "---"
-        f.write post.content
-      end
-    end
   end
 
 end
