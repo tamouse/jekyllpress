@@ -1,4 +1,6 @@
-263acca (HEAD, origin/master, master) fix: use thor actions to inject redirect_from into post.
+6eed295 (HEAD, master) fix: left binding.pry in the code :((
+5cd3348 (tag: v0.1.1, origin/master) Update CHANGELOG, bump VERSION.
+263acca fix: use thor actions to inject redirect_from into post.
 61a16b8 new: Add options to redirect to specify the permalink template and force overwriting.
 dbb8b67 (tag: v0.1.0) new: Add CHANGELOG.
 78c8b1c new: Add :redirect command to insert a 'redirect_from:' array in the front matter of each post in the _posts directory, to allow for blog restructuring, in service of using the jekyll-redirect-from gem.
