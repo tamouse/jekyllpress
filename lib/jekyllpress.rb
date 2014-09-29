@@ -118,7 +118,8 @@ redirect_from:
     def with_config(options={})
       raise "no block given at #{caller[1]}" unless block_given?
       self.class.source_root(jekyll_config["source"])
-      yield jekyll_config
+      config_reset
+      yield jekyll_config(options)
     end
 
     def with_posts(options={})
@@ -156,6 +157,10 @@ redirect_from:
         end
       end
       # @jekyll_config ||= Jekyll.configuration(options)
+    end
+
+    def config_reset
+      @jekyll_config = nil
     end
 
     def new_ext
