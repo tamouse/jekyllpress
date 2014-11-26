@@ -58,6 +58,14 @@ date: 2014-07-28 01:17
 ---
 ```
 
+### Redirects
+
+The `redirect` command helps to create redirect links in a post's front matter in a way that can be used by
+the [jekyll-redirect-from] gem.
+
+[jekyll-redirect-from]: https://github.com/jekyll/jekyll-redirect-from "Redirect old blog posts to new"
+
+
 ### Getting Help
 
 Actions and options can be seen by running `jekyllpress` with no paramters, or with the `help` action:
