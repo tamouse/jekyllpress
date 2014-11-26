@@ -27,16 +27,16 @@ module Jekyllpress
         create_file(File.join(source, template_dir, new_post_template),
           %q{---
             layout: post
-            title: <%= @title %>
+            title: "<%= @title %>"
             date: <%= Time.now.strftime("%Y-%m-%d %H:%M") %>
-            categories: <%= @categories %>
-            tags: <%= @tags %>
+            categories: [<%= Array(@categories).join(", ") %>]
+            tags: [<%= Array(@tags).join(", ") %>]
             ---
             }.gsub(/^\s*/,''))
         create_file(File.join(source, template_dir, new_page_template), 
           %q{---
             layout: page
-            title: <%= @title %>
+            title: "<%= @title %>"
             date: <%= Time.now.strftime("%Y-%m-%d %H:%M") %>
             ---
             }.gsub(/^\s*/,''))
