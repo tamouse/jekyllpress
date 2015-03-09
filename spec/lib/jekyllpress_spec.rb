@@ -33,7 +33,7 @@ describe "my Jekyllpress Thor script" do
         Dir.chdir(TEST_SITE) do |test_site|
           load 'jekyllpress.rb'
           Jekyllpress::App.start(%w[setup])
-          @action, @title, @filename, @categories, @tags = Jekyllpress::App.start(%w[new_post A\ New\ Post -c one two three -t able baker charlie])
+          @action, @title, @filename, @categories, @tags, @layout = Jekyllpress::App.start(%w[new_post A\ New\ Post -c one two three -t able baker charlie -l post2])
         end
       end
     end
@@ -48,6 +48,7 @@ describe "my Jekyllpress Thor script" do
     it {expect(@title).to eq "A New Post"}
     it {expect(@categories).to eq %w[one two three]}
     it {expect(@tags).to eq %w[able baker charlie]}
+    it {expect(@layout).to eq 'post2'}
     it {expect(@filename).to be_a String}
     it {expect(@filename).not_to be_empty}
     it {expect(@filename).to include("/_posts/#{Time.now.strftime("%Y-%m-%d")}-a-new-post.markdown")}
@@ -79,7 +80,7 @@ describe "my Jekyllpress Thor script" do
 
     context "create a new page" do
       before(:all) do
-        @action, @title, @filename, @location = Jekyllpress::App.start(%w[new_page A\ New\ Page -l=pages])
+        @action, @title, @filename, @location, @layout = Jekyllpress::App.start(%w[new_page A\ New\ Page -l=pages --layout=page2])
       end
 
       after(:all) do
@@ -88,6 +89,7 @@ describe "my Jekyllpress Thor script" do
 
       it {expect(@action).to eq :new_page}
       it {expect(@title).to eq "A New Page"}
+      it {expect(@layout).to eq "page2"}
       it {expect(@location).to eq "pages"}
       it {expect(@filename).to be_a String}
       it {expect(@filename).not_to be_empty}

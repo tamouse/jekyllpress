@@ -25,21 +25,21 @@ module Jekyllpress
       with_config do |config|
         empty_directory(File.join(source, template_dir))
         create_file(File.join(source, template_dir, new_post_template),
-          %q{---
-            layout: post
-            title: "<%= @title %>"
-            date: <%= Time.now.strftime("%Y-%m-%d %H:%M") %>
-            categories: [<%= Array(@categories).join(", ") %>]
-            tags: [<%= Array(@tags).join(", ") %>]
-            ---
-            }.gsub(/^\s*/,''))
+          '---
+           layout: <%= @layout %>
+           title: "<%= @title %>"
+           date: <%= Time.now.strftime("%Y-%m-%d %H:%M") %>
+           categories: <%= Array(@categories) %>
+           tags: <%= Array(@tags) %>
+           ---
+          '.gsub(/^\s*/,''))
         create_file(File.join(source, template_dir, new_page_template), 
-          %q{---
-            layout: page
-            title: "<%= @title %>"
-            date: <%= Time.now.strftime("%Y-%m-%d %H:%M") %>
-            ---
-            }.gsub(/^\s*/,''))
+          '---
+           layout: <%= @layout %>
+           title: "<%= @title %>"
+           date: <%= Time.now.strftime("%Y-%m-%d %H:%M") %>
+           ---
+          '.gsub(/^\s*/,''))
         [__method__, source, template_dir, new_post_template, new_page_template]
       end
     end
@@ -47,6 +47,7 @@ module Jekyllpress
     desc "new_post TITLE", "Create a new posts with title TITLE"
     method_option :categories, :desc => "list of categories to assign this post", :type => :array, :aliases => %w[-c]
     method_option :tags, :desc => "list of tags to assign this post", :type => :array, :aliases => %w[-t]
+    method_option :layout, :desc => "specify an alternate layout for the post", :type => :string, :aliases => %w[-l], :default => "post"
     def new_post(title="")
       check_templates
       @title = title.to_s
@@ -54,33 +55,34 @@ module Jekyllpress
 
       @categories = options.fetch("categories", [])
       @tags = options.fetch("tags", [])
-
+      @layout = options["layout"]
       with_config do |config|
         check_templates
-        filename = destination(source, posts_dir, post_filename(title))
+        @filename = destination(source, posts_dir, post_filename(title))
 
-        template(File.join(template_dir,new_post_template), filename)
+        template(File.join(template_dir,new_post_template), @filename)
 
-        [__method__, @title, filename, @categories, @tags]
+        [__method__, @title, @filename, @categories, @tags, @layout]
       end
     end
 
     desc "new_page TITLE", "Create a new page with title TITLE"
     method_option :location, :desc => "Location for page to appear in directory", :type => :string, :aliases => %w[-l --loc]
+    method_option :layout, :desc => "specify an alternate layout for the page", :type => :string, :default => "page"
     def new_page(title="")
       check_templates
       @title = title.to_s
       @title = ask("Page title: ") if @title.empty?
-
+      @layout = options["layout"]
       location = options.fetch("location", nil)
       raise "location can not be an absolute path: #{location}" if location[0] == ?/
 
       with_config do |config|
-        filename = destination(source, location, page_dirname(title), index_name)
+        @filename = destination(source, location, page_dirname(title), index_name)
 
-        template(File.join(template_dir, new_page_template), filename)
+        template(File.join(template_dir, new_page_template), @filename)
 
-        [__method__, @title, filename, location]
+        [__method__, @title, @filename, location, @layout]
       end
     end
 
