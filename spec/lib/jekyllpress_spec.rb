@@ -33,7 +33,6 @@ describe "my Jekyllpress Thor script" do
         Dir.chdir(TEST_SITE) do |test_site|
           load 'jekyllpress.rb'
           Jekyllpress::App.start(%w[setup])
-          @action, @title, @filename, @categories, @tags, @layout, @url = Jekyllpress::App.start(%w[new_post A\ New\ Post -c one two three -t able baker charlie -l post2 --url=https://github.com/tamouse])
         end
       end
     end
@@ -44,15 +43,55 @@ describe "my Jekyllpress Thor script" do
       end
     end
 
-    it {expect(@action).to eq :new_post}
-    it {expect(@title).to eq "A New Post"}
-    it {expect(@categories).to eq %w[one two three]}
-    it {expect(@tags).to eq %w[able baker charlie]}
-    it {expect(@layout).to eq 'post2'}
-    it {expect(@url).to eq 'https://github.com/tamouse'}
-    it {expect(@filename).to be_a String}
-    it {expect(@filename).not_to be_empty}
-    it {expect(@filename).to include("/_posts/#{Time.now.strftime("%Y-%m-%d")}-a-new-post.markdown")}
+    context "when using the default template" do
+      before(:all) do
+        @action, @title, @filename, @categories, @tags, @layout, @url, @template = Jekyllpress::App.start(%w[new_post A\ New\ Post -c one two three -t able baker charlie -l post2 --url=https://github.com/tamouse])
+      end
+
+      it {expect(@action).to eq :new_post}
+      it {expect(@title).to eq "A New Post"}
+      it {expect(@categories).to eq %w[one two three]}
+      it {expect(@tags).to eq %w[able baker charlie]}
+      it {expect(@layout).to eq 'post2'}
+      it {expect(@url).to eq 'https://github.com/tamouse'}
+      it {expect(@template).to eq 'new_post.markdown'}
+      it {expect(@filename).to be_a String}
+      it {expect(@filename).not_to be_empty}
+      it {expect(@filename).to include("/_posts/#{Time.now.strftime("%Y-%m-%d")}-a-new-post.markdown")}
+    end
+
+
+    context "when giving an alternate template" do
+      before(:all) do
+        alt_template = <<-EOF
+--
+layout: link
+title: <%= @title %>
+date: <%= Time.now.strftime("%Y-%m-%d %H:%M") %>
+---
+alternate template
+
+EOF
+        test_dir = File.expand_path('../../',__FILE__)
+        alt_template_file = File.join(test_dir, TEST_SITE, "_templates", "alt_post.markdown")
+
+
+        File.write(alt_template_file, alt_template)
+        
+        @action, @title, @filename, @categories, @tags, @layout, @url, @template = Jekyllpress::App.start(%w[new_post A\ New\ Post\ With\ Alt\ Template -c one two three -t able baker charlie -l link --url=https://github.com/tamouse --template=alt_post.markdown])
+      end
+
+      it {expect(@action).to eq :new_post}
+      it {expect(@title).to eq "A New Post With Alt Template"}
+      it {expect(@categories).to eq %w[one two three]}
+      it {expect(@tags).to eq %w[able baker charlie]}
+      it {expect(@layout).to eq 'link'}
+      it {expect(@url).to eq 'https://github.com/tamouse'}
+      it {expect(@template).to eq "alt_post.markdown"}
+      it {expect(@filename).to be_a String}
+      it {expect(@filename).not_to be_empty}
+      it {expect(@filename).to include("/_posts/#{Time.now.strftime("%Y-%m-%d")}-a-new-post-with-alt-template.markdown")}
+    end
   end
 
   describe ":new_page" do

@@ -50,6 +50,7 @@ module Jekyllpress
     method_option :tags, :desc => "list of tags to assign this post", :type => :array, :aliases => %w[-t]
     method_option :layout, :desc => "specify an alternate layout for the post", :type => :string, :aliases => %w[-l], :default => "post"
     method_option :url, :desc => "source URL for blog post", :type => :string
+    method_option :template, :desc => "specify an alternate template to use for the post", :type => :string
     def new_post(title="")
       check_templates
       @title = title.to_s
@@ -59,14 +60,15 @@ module Jekyllpress
       @tags = options.fetch("tags", [])
       @layout = options[:layout]
       @url = options[:url]
-
+      @template = options.fetch("template") { new_post_template }
+      
       with_config do |config|
         check_templates
         @filename = destination(source, posts_dir, post_filename(title))
 
-        template(File.join(template_dir,new_post_template), @filename)
+        template(File.join(template_dir, @template), @filename)
 
-        [__method__, @title, @filename, @categories, @tags, @layout, @url]
+        [__method__, @title, @filename, @categories, @tags, @layout, @url, @template]
       end
     end
 
@@ -202,7 +204,7 @@ redirect_from:
     end
 
     def new_post_template
-      jekyll_config["templates"]["new_post_template"]      
+      jekyll_config["templates"]["new_post_template"]
     end
 
     def new_page_template
