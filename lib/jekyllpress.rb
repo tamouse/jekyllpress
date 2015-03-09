@@ -31,6 +31,7 @@ module Jekyllpress
            date: <%= Time.now.strftime("%Y-%m-%d %H:%M") %>
            categories: <%= Array(@categories) %>
            tags: <%= Array(@tags) %>
+           source: "<%= @url %>"
            ---
           '.gsub(/^\s*/,''))
         create_file(File.join(source, template_dir, new_page_template), 
@@ -48,6 +49,7 @@ module Jekyllpress
     method_option :categories, :desc => "list of categories to assign this post", :type => :array, :aliases => %w[-c]
     method_option :tags, :desc => "list of tags to assign this post", :type => :array, :aliases => %w[-t]
     method_option :layout, :desc => "specify an alternate layout for the post", :type => :string, :aliases => %w[-l], :default => "post"
+    method_option :url, :desc => "source URL for blog post", :type => :string
     def new_post(title="")
       check_templates
       @title = title.to_s
@@ -55,14 +57,16 @@ module Jekyllpress
 
       @categories = options.fetch("categories", [])
       @tags = options.fetch("tags", [])
-      @layout = options["layout"]
+      @layout = options[:layout]
+      @url = options[:url]
+
       with_config do |config|
         check_templates
         @filename = destination(source, posts_dir, post_filename(title))
 
         template(File.join(template_dir,new_post_template), @filename)
 
-        [__method__, @title, @filename, @categories, @tags, @layout]
+        [__method__, @title, @filename, @categories, @tags, @layout, @url]
       end
     end
 

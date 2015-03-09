@@ -33,7 +33,7 @@ describe "my Jekyllpress Thor script" do
         Dir.chdir(TEST_SITE) do |test_site|
           load 'jekyllpress.rb'
           Jekyllpress::App.start(%w[setup])
-          @action, @title, @filename, @categories, @tags, @layout = Jekyllpress::App.start(%w[new_post A\ New\ Post -c one two three -t able baker charlie -l post2])
+          @action, @title, @filename, @categories, @tags, @layout, @url = Jekyllpress::App.start(%w[new_post A\ New\ Post -c one two three -t able baker charlie -l post2 --url=https://github.com/tamouse])
         end
       end
     end
@@ -49,6 +49,7 @@ describe "my Jekyllpress Thor script" do
     it {expect(@categories).to eq %w[one two three]}
     it {expect(@tags).to eq %w[able baker charlie]}
     it {expect(@layout).to eq 'post2'}
+    it {expect(@url).to eq 'https://github.com/tamouse'}
     it {expect(@filename).to be_a String}
     it {expect(@filename).not_to be_empty}
     it {expect(@filename).to include("/_posts/#{Time.now.strftime("%Y-%m-%d")}-a-new-post.markdown")}
