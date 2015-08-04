@@ -28,17 +28,16 @@ module Jekyllpress
           '---
            layout: <%= @layout %>
            title: "<%= @title %>"
-           date: <%= Time.now.strftime("%Y-%m-%d %H:%M") %>
+           date: <%= @date %> <%= @time %>
            categories: <%= Array(@categories) %>
            tags: <%= Array(@tags) %>
            source: "<%= @url %>"
            ---
           '.gsub(/^\s*/,''))
-        create_file(File.join(source, template_dir, new_page_template), 
+        create_file(File.join(source, template_dir, new_page_template),
           '---
            layout: <%= @layout %>
            title: "<%= @title %>"
-           date: <%= Time.now.strftime("%Y-%m-%d %H:%M") %>
            ---
           '.gsub(/^\s*/,''))
         [__method__, source, template_dir, new_post_template, new_page_template]
@@ -51,24 +50,28 @@ module Jekyllpress
     method_option :layout, :desc => "specify an alternate layout for the post", :type => :string, :aliases => %w[-l], :default => "post"
     method_option :url, :desc => "source URL for blog post", :type => :string
     method_option :template, :desc => "specify an alternate template to use for the post", :type => :string
+    method_option :date, :desc => "provide an alternate date for the post", :type => :string, :default => Date.today.iso8601
+    method_option :time, :desc => "provide an alternate time of day for the post", :type => :string, :default => Time.now.strftime("%H:%M")
     def new_post(title="")
       check_templates
       @title = title.to_s
       @title = ask("Title for your post: ") if @title.empty?
 
+      @date = options.fetch("date", Date.today.iso8601)
+      @time = options.fetch("time", Time.now.strftime("%H:%M"))
       @categories = options.fetch("categories", [])
       @tags = options.fetch("tags", [])
       @layout = options[:layout]
       @url = options[:url]
       @template = options.fetch("template") { new_post_template }
-      
+
       with_config do |config|
         check_templates
-        @filename = destination(source, posts_dir, post_filename(title))
+        @filename = destination(source, posts_dir, post_filename(@title, @date))
 
         template(File.join(template_dir, @template), @filename)
 
-        [__method__, @title, @filename, @categories, @tags, @layout, @url, @template]
+        [__method__, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template]
       end
     end
 
@@ -84,7 +87,7 @@ module Jekyllpress
       raise "location can not be an absolute path: #{location}" if location[0] == ?/
 
       with_config do |config|
-        @filename = destination(source, location, page_dirname(title), index_name)
+        @filename = destination(source, location, page_dirname(@title), index_name)
 
         template(File.join(template_dir, new_page_template), @filename)
 
@@ -104,7 +107,7 @@ module Jekyllpress
       with_posts({"permalink" => permalink_template}) do |post|
         if post.data.has_key?("redirect_from") && !force_redirect
           say "skipping #{post.name} - redirect_from detected"
-          next 
+          next
         end
 
         time_now = Time.now
@@ -179,8 +182,8 @@ redirect_from:
       jekyll_config['source']
     end
 
-    def post_filename(title)
-      "#{Time.now.strftime("%Y-%m-%d")}-#{title.to_url}.#{new_ext}"
+    def post_filename(title, date=Date.today.iso8601)
+      "#{date}-#{title.to_url}.#{new_ext}"
     end
 
     def page_dirname(title)

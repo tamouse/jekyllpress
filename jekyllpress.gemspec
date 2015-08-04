@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "thor", ">= 0.19"
-  spec.add_dependency "jekyll", ">= 2.1"
+  spec.add_dependency "jekyll"
   spec.add_dependency "stringex", ">= 2"
 
   spec.add_development_dependency "bundler", "~> 1.6"
