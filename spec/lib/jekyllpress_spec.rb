@@ -7,7 +7,7 @@ def kill_jekyll
   # I'm not altogether sure why I have to do this, but apparently
   # the way thor, rspec, and jekyll all meld, something goes haywire.
   $".delete_if{|x| x.match(%r[(/gems/jekyll-.+/lib/jekyll)])}
-  # run `load 'jekyllpress.rb'` in each test setup where you have a 
+  # run `load 'jekyllpress.rb'` in each test setup where you have a
   # jekyll test directory to work with
 end
 
@@ -22,7 +22,7 @@ describe "my Jekyllpress Thor script" do
     it {expect(Jekyllpress::App.start(%w[version])).to include(Jekyllpress::VERSION)}
     it {expect(Jekyllpress::App.start(%w[-V])).to include(Jekyllpress::VERSION)}
     it {expect(Jekyllpress::App.start(%w[--version])).to include(Jekyllpress::VERSION)}
-  end  
+  end
 
   describe ":new_post" do
     before(:all) do
@@ -31,6 +31,7 @@ describe "my Jekyllpress Thor script" do
         FileUtils.rm_rf TEST_SITE
         `jekyll new #{TEST_SITE}`
         Dir.chdir(TEST_SITE) do |test_site|
+          FileUtils.mkdir_p '_my_collection'
           load 'jekyllpress.rb'
           Jekyllpress::App.start(%w[setup])
         end
@@ -43,13 +44,32 @@ describe "my Jekyllpress Thor script" do
       end
     end
 
+    context "when using all defaults" do
+      before(:all) do
+        @action, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template, @location =
+          Jekyllpress::App.start(%w[new_post Using\ The\ Defaults])
+      end
+      it {expect(@action).to eq :new_post}
+      it {expect(@title).to eq "Using The Defaults"}
+      it {expect(@date).to eq Date.today.iso8601}
+      it {expect(@categories).to eq []}
+      it {expect(@tags).to eq []}
+      it {expect(@template).to eq 'new_post.markdown'}
+      it {expect(@filename).to be_a String}
+      it {expect(@filename).not_to be_empty}
+      it {expect(@filename).to match %r{/_posts/.*-using-the-defaults\.markdown} }
+      it {expect(@location).to eq "_posts"}
+    end
+
     context "when using the default template" do
       before(:all) do
-        @action, @title, @filename, @categories, @tags, @layout, @url, @template = Jekyllpress::App.start(%w[new_post A\ New\ Post -c one two three -t able baker charlie -l post2 --url=https://github.com/tamouse])
+        @action, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template, @location = Jekyllpress::App.start(%w[new_post A\ New\ Post --date=2001-01-01 --time=11:15 -c one two three -t able baker charlie -l post2 --url=https://github.com/tamouse])
       end
 
       it {expect(@action).to eq :new_post}
       it {expect(@title).to eq "A New Post"}
+      it {expect(@date).to eq '2001-01-01'}
+      it {expect(@time).to eq '11:15'}
       it {expect(@categories).to eq %w[one two three]}
       it {expect(@tags).to eq %w[able baker charlie]}
       it {expect(@layout).to eq 'post2'}
@@ -57,7 +77,8 @@ describe "my Jekyllpress Thor script" do
       it {expect(@template).to eq 'new_post.markdown'}
       it {expect(@filename).to be_a String}
       it {expect(@filename).not_to be_empty}
-      it {expect(@filename).to include("/_posts/#{Time.now.strftime("%Y-%m-%d")}-a-new-post.markdown")}
+      it {expect(@filename).to include("/_posts/2001-01-01-a-new-post.markdown")}
+      it {expect(@location).to eq "_posts"}
     end
 
 
@@ -77,12 +98,14 @@ EOF
 
 
         File.write(alt_template_file, alt_template)
-        
-        @action, @title, @filename, @categories, @tags, @layout, @url, @template = Jekyllpress::App.start(%w[new_post A\ New\ Post\ With\ Alt\ Template -c one two three -t able baker charlie -l link --url=https://github.com/tamouse --template=alt_post.markdown])
+
+        @action, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template, @location = Jekyllpress::App.start(%w[new_post A\ New\ Post\ With\ Alt\ Template -c one two three -t able baker charlie -l link --url=https://github.com/tamouse --template=alt_post.markdown --date=2001-01-01 --time=11:15])
       end
 
       it {expect(@action).to eq :new_post}
       it {expect(@title).to eq "A New Post With Alt Template"}
+      it {expect(@date).to eq '2001-01-01'}
+      it {expect(@time).to eq '11:15'}
       it {expect(@categories).to eq %w[one two three]}
       it {expect(@tags).to eq %w[able baker charlie]}
       it {expect(@layout).to eq 'link'}
@@ -90,8 +113,27 @@ EOF
       it {expect(@template).to eq "alt_post.markdown"}
       it {expect(@filename).to be_a String}
       it {expect(@filename).not_to be_empty}
-      it {expect(@filename).to include("/_posts/#{Time.now.strftime("%Y-%m-%d")}-a-new-post-with-alt-template.markdown")}
+      it {expect(@filename).to include("/_posts/2001-01-01-a-new-post-with-alt-template.markdown")}
+      it {expect(@location).to eq "_posts"}
     end
+
+    context "when using a different location" do
+      before(:all) do
+        @action, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template, @location =
+          Jekyllpress::App.start(%w[new_post Diff-Location --location=_my_collection])
+      end
+      it {expect(@action).to eq :new_post}
+      it {expect(@title).to eq "Diff-Location"}
+      it {expect(@date).to eq Date.today.iso8601}
+      it {expect(@categories).to eq []}
+      it {expect(@tags).to eq []}
+      it {expect(@template).to eq 'new_post.markdown'}
+      it {expect(@filename).to be_a String}
+      it {expect(@filename).not_to be_empty}
+      it {expect(@filename).to match %r{/_my_collection/.*-diff-location\.markdown} }
+      it {expect(@location).to eq "_my_collection"}
+    end
+
   end
 
   describe ":new_page" do
@@ -193,7 +235,7 @@ EOF
 
   end
 
-  describe ":redirect" do
+  xdescribe ":redirect" do
     before do
       kill_jekyll
       Dir.chdir("spec") do |spec_dir|
@@ -203,9 +245,9 @@ EOF
           load 'jekyllpress.rb'
           File.open(File.join("_posts","2013-12-31-an-old-post.markdown"), 'w') do |post|
             frontmatter = {
-              "title" => "An old post", 
+              "title" => "An old post",
               "date" => "2013-12-31 12:31",
-              "layout" => "post", 
+              "layout" => "post",
               "redirect_from" => Array("/oldsite/2013/12/31/an-old-post/")
             }
             post.puts frontmatter.to_yaml
@@ -236,7 +278,7 @@ EOF
         expect(@posts.count).to eq(1)
         @posts.each do |post|
           post_content = File.read post[:file]
-          expect(post_content).to match(%r{^redirect_from:$}) 
+          expect(post_content).to match(%r{^redirect_from:$})
           expect(post_content).to  match(%r{^  - /BLOG/})
         end
       end

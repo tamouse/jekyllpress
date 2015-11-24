@@ -1,3 +1,9 @@
+2015-11-24  Tamara Temple  <tamouse.lists@gmail.com>
+
+	* lib/jekyllpress.rb (Jekyllpress::App#new_post): add a new
+	paramters to the new post command to set the location for the new
+	page to live.
+
 d1d64f0 (HEAD, origin/master, master) fix: reset @jekyll_config after reading location of configuration file.
 4822f67 (tag: v0.1.2) Update CHANGELOG, bump VERSION.
 6eed295 fix: left binding.pry in the code :((
