@@ -31,6 +31,7 @@ describe "my Jekyllpress Thor script" do
         FileUtils.rm_rf TEST_SITE
         `jekyll new #{TEST_SITE}`
         Dir.chdir(TEST_SITE) do |test_site|
+          FileUtils.mkdir_p '_my_collection'
           load 'jekyllpress.rb'
           Jekyllpress::App.start(%w[setup])
         end
@@ -45,7 +46,7 @@ describe "my Jekyllpress Thor script" do
 
     context "when using all defaults" do
       before(:all) do
-        @action, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template =
+        @action, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template, @location =
           Jekyllpress::App.start(%w[new_post Using\ The\ Defaults])
       end
       it {expect(@action).to eq :new_post}
@@ -57,11 +58,12 @@ describe "my Jekyllpress Thor script" do
       it {expect(@filename).to be_a String}
       it {expect(@filename).not_to be_empty}
       it {expect(@filename).to match %r{/_posts/.*-using-the-defaults\.markdown} }
+      it {expect(@location).to eq "_posts"}
     end
 
     context "when using the default template" do
       before(:all) do
-        @action, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template = Jekyllpress::App.start(%w[new_post A\ New\ Post --date=2001-01-01 --time=11:15 -c one two three -t able baker charlie -l post2 --url=https://github.com/tamouse])
+        @action, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template, @location = Jekyllpress::App.start(%w[new_post A\ New\ Post --date=2001-01-01 --time=11:15 -c one two three -t able baker charlie -l post2 --url=https://github.com/tamouse])
       end
 
       it {expect(@action).to eq :new_post}
@@ -76,6 +78,7 @@ describe "my Jekyllpress Thor script" do
       it {expect(@filename).to be_a String}
       it {expect(@filename).not_to be_empty}
       it {expect(@filename).to include("/_posts/2001-01-01-a-new-post.markdown")}
+      it {expect(@location).to eq "_posts"}
     end
 
 
@@ -96,7 +99,7 @@ EOF
 
         File.write(alt_template_file, alt_template)
 
-        @action, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template = Jekyllpress::App.start(%w[new_post A\ New\ Post\ With\ Alt\ Template -c one two three -t able baker charlie -l link --url=https://github.com/tamouse --template=alt_post.markdown --date=2001-01-01 --time=11:15])
+        @action, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template, @location = Jekyllpress::App.start(%w[new_post A\ New\ Post\ With\ Alt\ Template -c one two three -t able baker charlie -l link --url=https://github.com/tamouse --template=alt_post.markdown --date=2001-01-01 --time=11:15])
       end
 
       it {expect(@action).to eq :new_post}
@@ -111,7 +114,26 @@ EOF
       it {expect(@filename).to be_a String}
       it {expect(@filename).not_to be_empty}
       it {expect(@filename).to include("/_posts/2001-01-01-a-new-post-with-alt-template.markdown")}
+      it {expect(@location).to eq "_posts"}
     end
+
+    context "when using a different location" do
+      before(:all) do
+        @action, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template, @location =
+          Jekyllpress::App.start(%w[new_post Diff-Location --location=_my_collection])
+      end
+      it {expect(@action).to eq :new_post}
+      it {expect(@title).to eq "Diff-Location"}
+      it {expect(@date).to eq Date.today.iso8601}
+      it {expect(@categories).to eq []}
+      it {expect(@tags).to eq []}
+      it {expect(@template).to eq 'new_post.markdown'}
+      it {expect(@filename).to be_a String}
+      it {expect(@filename).not_to be_empty}
+      it {expect(@filename).to match %r{/_my_collection/.*-diff-location\.markdown} }
+      it {expect(@location).to eq "_my_collection"}
+    end
+
   end
 
   describe ":new_page" do
@@ -213,7 +235,7 @@ EOF
 
   end
 
-  describe ":redirect" do
+  xdescribe ":redirect" do
     before do
       kill_jekyll
       Dir.chdir("spec") do |spec_dir|

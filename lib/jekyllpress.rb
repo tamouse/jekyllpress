@@ -52,6 +52,7 @@ module Jekyllpress
     method_option :template, :desc => "specify an alternate template to use for the post", :type => :string
     method_option :date, :desc => "provide an alternate date for the post", :type => :string, :default => Date.today.iso8601
     method_option :time, :desc => "provide an alternate time of day for the post", :type => :string, :default => Time.now.strftime("%H:%M")
+    method_option :location, :desc => "Location for page to appear in directory", :type => :string, :aliases => %w[-L --loc], :default => nil
     def new_post(title="")
       check_templates
       @title = title.to_s
@@ -64,14 +65,13 @@ module Jekyllpress
       @layout = options[:layout]
       @url = options[:url]
       @template = options.fetch("template") { new_post_template }
+      @location = options.fetch("location", posts_dir) || posts_dir
 
       with_config do |config|
         check_templates
-        @filename = destination(source, posts_dir, post_filename(@title, @date))
-
+        @filename = destination(source, @location, post_filename(@title, @date))
         template(File.join(template_dir, @template), @filename)
-
-        [__method__, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template]
+        [__method__, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template, @location]
       end
     end
 
