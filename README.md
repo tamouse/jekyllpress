@@ -2,6 +2,8 @@
 
 A [Thor](http://whatisthor.com) script that provides several actions to help support and use a [Jekyll](http://jekyllrb.com) site.
 
+[![help wanted](https://img.shields.io/badge/Help-Wanted-brightgreen.svg)](https://github.com/tamouse/jekyllpress/issues)
+
 ## Installation
 
     $ gem install jekyllpress
