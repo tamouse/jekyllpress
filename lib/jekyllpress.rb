@@ -1,8 +1,11 @@
 require 'thor'
 require 'jekyll'
 require 'fileutils'
+require 'i18n'
 require 'stringex_lite'
 require "jekyllpress/version"
+
+I18n.enforce_available_locales = false
 
 module Jekyllpress
 
