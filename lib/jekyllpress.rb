@@ -31,7 +31,7 @@ module Jekyllpress
           '---
            layout: <%= @layout %>
            title: "<%= @title %>"
-           date: <%= @date %> <%= @time %>
+           date: <%= @date %>T<%= @time %>
            categories: <%= Array(@categories) %>
            tags: <%= Array(@tags) %>
            source: "<%= @url %>"
