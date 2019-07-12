@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require 'jekyllpress'
+Jekyllpress::App.start(ARGV)

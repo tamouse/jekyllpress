@@ -78,6 +78,37 @@ module Jekyllpress
       end
     end
 
+    desc "np TITLE", "Create a new posts with title TITLE"
+    method_option :categories, :desc => "list of categories to assign this post", :type => :array, :aliases => %w[-c]
+    method_option :tags, :desc => "list of tags to assign this post", :type => :array, :aliases => %w[-t]
+    method_option :layout, :desc => "specify an alternate layout for the post", :type => :string, :aliases => %w[-l], :default => "post"
+    method_option :url, :desc => "source URL for blog post", :type => :string
+    method_option :template, :desc => "specify an alternate template to use for the post", :type => :string
+    method_option :date, :desc => "provide an alternate date for the post", :type => :string, :default => Date.today.iso8601
+    method_option :time, :desc => "provide an alternate time of day for the post", :type => :string, :default => Time.now.strftime("%H:%M")
+    method_option :location, :desc => "Location for page to appear in directory", :type => :string, :aliases => %w[-L --loc], :default => nil
+    def np(title="")
+      check_templates
+      @title = title.to_s
+      @title = ask("Title for your post: ") if @title.empty?
+
+      @date = options.fetch("date", Date.today.iso8601)
+      @time = options.fetch("time", Time.now.strftime("%H:%M"))
+      @categories = options.fetch("categories", [])
+      @tags = options.fetch("tags", [])
+      @layout = options[:layout]
+      @url = options[:url]
+      @template = options.fetch("template") { new_post_template }
+      @location = options.fetch("location", posts_dir) || posts_dir
+
+      with_config do |config|
+        check_templates
+        @filename = destination(source, @location, post_filename(@title, @date))
+        template(File.join(template_dir, @template), @filename)
+        [__method__, @title, @date, @time, @filename, @categories, @tags, @layout, @url, @template, @location]
+      end
+    end
+
     desc "new_page TITLE", "Create a new page with title TITLE"
     method_option :location, :desc => "Location for page to appear in directory", :type => :string, :aliases => %w[-l --loc]
     method_option :layout, :desc => "specify an alternate layout for the page", :type => :string, :default => "page"
